@@ -1,0 +1,40 @@
+---
+- name: Install NGINX Ingress Controller on Kubernetes (for kind or local cluster)
+  hosts: localhost
+  become: no
+  connection: local
+
+  vars:
+    nginx_manifest_path: "/Users/ptk-a250076-mb/3_project/dev/modules/nginx/deploy_nginx.yaml"
+
+  tasks:
+    # - name: Label node for ingress-nginx
+    #   ansible.builtin.shell: >
+    #     kubectl label node {{ ingress_node_name }} ingress-ready=true --overwrite
+    #   args:
+    #     executable: /bin/bash
+    #   register: label_result
+    #   changed_when: "'ingress-ready=true' in label_result.stdout or 'labeled' in label_result.stdout"
+
+    - name: Install NGINX Ingress Controller from local manifest
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ nginx_manifest_path }}"
+        apply: true
+
+    - name: Wait for NGINX Ingress Controller to become ready
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ kubeconfig }}"
+        kind: Pod
+        namespace: ingress-nginx
+        label_selectors:
+          - app.kubernetes.io/component=controller
+      register: ingress_pods
+
+    - name: Wait until all ingress controller pods are ready
+      ansible.builtin.wait_for:
+        timeout: 120
+        state: started
+        delay: 5
+      when: ingress_pods.resources | length > 0

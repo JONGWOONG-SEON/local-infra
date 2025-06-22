@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "gitea-env"
+  namespace: "default"
+data:
+  USER_UID: "501"
+  USER_GID: "1000"
+  GITEA__server__ROOT_URL: "http://localhost:30080"
+  GITEA__server__ENABLE_WORKFLOWS: "true"
+  GITEA__ACTIONS__ENABLED: "true"
+  GITEA__database__DB_TYPE: "postgres"
+  GITEA__database__HOST: "postgres-svc.default:5432"
+  GITEA__database__NAME: "gitea"
+  GITEA__database__USER: "admin"
+  GITEA__database__PASSWD: "admin"
+  GITEA__database__SSL_MODE: "disable"

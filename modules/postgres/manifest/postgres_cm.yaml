@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "postgres-env"
+  namespace: "default"
+data:
+  POSTGRES_USER: "admin"
+  POSTGRES_PASSWORD: "admin"
+  POSTGRES_DB: "airflow"
+  PGDATA: "/postgresdata/pgdata"

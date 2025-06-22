@@ -1,0 +1,6 @@
+.env
+./testcode
+./log
+./archive
+**/__pycache__
+__pycache__

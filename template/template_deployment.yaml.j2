@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ AppName }}"
+  namespace: "{{ Namespace }}"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "{{ AppName }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ AppName }}"
+    spec:
+{% if securityContext is defined %}
+      securityContext:
+{% if securityContext.runAsUser is defined and securityContext.runAsUser != ""%}
+        runAsUser: {{ securityContext.runAsUser | int}}
+{% endif %}
+{% endif %}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "{{ ModuleName }}"
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+        - name: "{{ AppName }}"
+          image: "{{ Image }}"
+          imagePullPolicy: IfNotPresent
+{% if Args is defined %}
+          command: ["/bin/bash", "-c"]
+          args:
+              - "{{ Args | join(' && ') }}"
+{% endif %}
+          envFrom:
+            - configMapRef:
+                name: "{{ ConfigMapName }}"
+{% if VolumeMountsName is defined and VolumeMountsPath is defined %}
+          volumeMounts:
+            - name: "{{ VolumeMountsName }}"
+              mountPath: "{{ VolumeMountsPath }}"
+{% endif %}
+{% if containerport.Port is defined and containerport.Port != "" %}
+{% for containerport in ContainerPort %}
+          ports: 
+            - containerPort: {{ containerport.Port | int }}
+{% endfor %}
+{% endif %}
+{% if VolumeMountsName is defined and VolumeMountsPath is defined %}
+      volumes:
+        - name: "{{ VolumeMountsName }}"
+          persistentVolumeClaim:
+            claimName: "{{ PvcName }}"
+{% endif %}

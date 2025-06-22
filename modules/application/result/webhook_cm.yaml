@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "webhook-env"
+  namespace: "webhook"
+data:
+  AIRFLOW_HOST: "http://airflow-svc.default"
+  AIRFLOW_PORT: "80"
+  AIRFLOW_USERNAME: "admin"
+  AIRFLOW_PASSWORD: "admin"
+  AIRFLOW_DB_PATH: "postgres://admin:admin@postgres-svc.default:5432/airflow?sslmode=disable"

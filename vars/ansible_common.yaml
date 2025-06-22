@@ -1,0 +1,106 @@
+## 공통
+# Protocol 정의
+Protocol: &protocol_setting
+  web: "http://"
+  db: "postgresql+psycopg2://"
+  minio: "s3://"
+
+Prefix: &prefix_setting
+  service: "-svc"
+  persistentvolume: "-pv"
+  persistentVolumeClaim: "-pvc"
+  domain: ".local"
+  configmap: "-env"
+
+DataBase:
+  airflow: "airflow"
+  gitea: "gitea"
+  mart: "bi"
+
+
+## 모듈별
+# airflow
+airflow: 
+  name: "airflow"
+  namespace: "default"
+  image: "localhost:5000/custom-airflow:0.1"
+  id: "admin"
+  pwd: "admin"
+  port: "80"
+  targetPort: "8080"
+  containerport:
+    - port: "8080"
+  home: "/opt/airflow"
+  service_name: "airflow-svc"
+  web:
+    name: "airflow-web"
+    args:
+      - rm -f $AIRFLOW_HOME/airflow-webserver.pid
+      - airflow db upgrade
+      - exec airflow webserver
+  scheduler:
+    name: "airflow-schduler"
+    args:
+      - airflow db upgrade
+      - exec airflow scheduler
+  gitsync:
+    name: "git-sync"
+    image: "localhost:5000/k8s.gcr.io/git-sync/git-sync:v3.6.6"
+  mount:
+    name: "dags-main"
+    path: "/opt/airflow/dags"
+  ingress:
+    port: "80"
+  service:
+    - name: "airflow-svc"
+      port: "80"
+      targetPort: "8080"
+
+postgres:
+  name: "postgres"
+  namespace: "default"
+  image: "localhost:5000/postgres:15"
+  id: "admin"
+  pwd: "admin"
+  service_name: "postgres-svc"
+  port: "5432"
+  ingress:
+    port: "5432"
+  service:
+    - name: "postgres-svc"
+      port: "5432"
+      targetPort: "5432"
+      nodePort: "30432"
+  mount:
+    name: "postgres-claim"
+    path: "/postgresdata"
+    
+
+minio:
+  name: "minio"
+  namespace: "default"
+  image: "localhost:5000/quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z"
+  id: "minioadmin"
+  pwd: "minioadmin"
+  args:
+    - minio server /data --address=:9000 --console-address=:9090
+  service_name: "minio-svc"
+  containerport:
+    - port: "9090"
+    - port: "9000"
+  ingress:
+    name: "minio-ingress"
+    port: "80"
+    targetPort: "9090"
+  service:
+    - name: "minio-web"
+      port: "80"
+      targetPort: "9090"
+    - name: "minio-api"
+      port: "9000"
+      targetPort: "9000"
+      nodePort: "30081"
+
+webhook:
+  name: "webhook"
+  namespace: "webhook"

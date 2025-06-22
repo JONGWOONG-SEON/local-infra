@@ -1,0 +1,6 @@
+ConfigData: 
+  AIRFLOW_HOST : "{{ Protocol.web }}{{ airflow.service_name }}.{{ airflow.namespace }}"
+  AIRFLOW_PORT : "{{ airflow.port }}"
+  AIRFLOW_USERNAME : "{{ airflow.id }}"
+  AIRFLOW_PASSWORD : "{{ airflow.pwd }}"
+  AIRFLOW_DB_PATH : "postgres://admin:admin@postgres-svc.default:5432/airflow?sslmode=disable"

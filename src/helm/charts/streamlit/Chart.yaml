@@ -1,0 +1,5 @@
+apiVersion: v2
+name: streamlit
+description: A Helm chart for streamlit static site
+version: 0.1.1
+appVersion: "1.0"

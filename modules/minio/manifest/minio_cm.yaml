@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "minio-env"
+  namespace: "default"
+data:
+  MINIO_ROOT_USER: "minioadmin"
+  MINIO_ROOT_PASSWORD: "minioadmin"
+  MINIO_API_SYNC_EVENTS: "on"
+  MINIO_NOTIFY_WEBHOOK_ENABLE_BUCKET: "on"
+  MINIO_NOTIFY_WEBHOOK_ENDPOINT_BUCKET: "http://webhook-webhook.webhook:8081/minio/webhook"

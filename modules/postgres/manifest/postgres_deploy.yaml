@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "postgres"
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "postgres"
+  template:
+    metadata:
+      labels:
+        app: "postgres"
+    spec:
+      securityContext:
+        runAsUser: 501
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "postgres"
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+        - name: "postgres"
+          image: "localhost:5000/postgres:15"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: "postgres-env"
+          volumeMounts:
+            - name: "postgres-claim"
+              mountPath: "/postgresdata"
+      volumes:
+        - name: "postgres-claim"
+          persistentVolumeClaim:
+            claimName: "postgres-pvc"

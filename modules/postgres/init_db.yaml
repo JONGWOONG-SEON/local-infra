@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init-job
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - name: psql
+          image: localhost:5000/postgres:15
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              psql -h $PGHOST -U $PGUSER -d postgres <<'EOF'
+              CREATE DATABASE airflow;
+              CREATE DATABASE gitea;
+              CREATE DATABASE argocd;
+
+              GRANT ALL PRIVILEGES ON DATABASE airflow TO admin;
+              GRANT ALL PRIVILEGES ON DATABASE argocd TO admin;
+              EOF
+          env:
+            - name: PGPASSWORD
+              value: admin
+            - name: PGUSER
+              value: admin
+            - name: PGHOST
+              value: postgres-svc.default
+      restartPolicy: OnFailure

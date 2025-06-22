@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: act-runner
+  namespace: default
+  labels:
+    app: act-runner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: act-runner
+  template:
+    metadata:
+      labels:
+        app: act-runner
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet 
+      restartPolicy: Always
+      containers:
+      - name: dind
+        image: localhost:5000/docker:dind
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
+          privileged: true
+          allowPrivilegeEscalation: true
+        command: ["dockerd"]
+        args: ["--insecure-registry=172.18.0.7:5000","--insecure-registry=registry.local:5000"]
+        env:
+          - name: DOCKER_TLS_CERTDIR
+            value: "" 
+        volumeMounts:
+          - name: docker-graph
+            mountPath: /var/run
+      - name: runner
+        image: localhost:5000/gitea/act_runner:0.2.11
+        imagePullPolicy: IfNotPresent
+        envFrom:
+          - configMapRef:
+              name: "runner-env"
+        volumeMounts:
+          - name: docker-graph
+            mountPath: /var/run
+      volumes:
+        - name: docker-graph
+          emptyDir: {}
+        - name: runner-data
+          emptyDir: {}
+

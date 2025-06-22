@@ -1,0 +1,46 @@
+---
+- name: Deploy Gitsync Airflow 
+  hosts: localhost
+  become: no
+  connection: local
+  
+  vars_files:
+    - ./vars/gitsync_configmap.yaml
+  
+  vars:
+    ModuleName: "git-sync"
+    NameSpace: "default"
+    ansible_python_interpreter: "/Users/ptk-a250076-mb/3_project/dev/venv/bin/python"
+    GitSyncPath: "./manifest/git_sync_deploy.yaml"
+
+  tasks:
+    - name: Deploy Airflow ConfigMap
+      template:
+        src: ../../template/template_configmap.yaml.j2
+        dest: /tmp/{{ ModuleName }}_cm.yaml
+
+    - name: Catch Airflow CofnigMap
+      shell: cat /tmp/{{ ModuleName }}_cm.yaml
+      register: rendered
+
+    - debug:
+        var: rendered.stdout_lines
+
+    - name: Apply Manifest
+      shell: kubectl apply -f /tmp/{{ ModuleName }}_cm.yaml
+      args:
+        executable: /bin/bash
+      register: apply_result
+      failed_when: apply_result.rc != 0
+
+    - name: Save Manifest Temp to Local
+      shell: |
+        cp /tmp/{{ ModuleName }}_cm.yaml ./manifest/{{ ModuleName }}_cm.yaml
+      when: apply_result.rc == 0
+
+    - name: Apply GitSync
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ GitSyncPath }}"
+        apply: true

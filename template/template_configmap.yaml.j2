@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ ModuleName | default('runner') }}-env"
+  namespace: "{{ NameSpace | default('default') }}"
+data:
+{% for key, val in ConfigData.items() %}
+  {{ key }}:{% if val is mapping %} |
+{{ val | to_nice_yaml(indent=4) | indent(4) }}
+{% else %} "{{ val }}"
+{% endif %}
+{% endfor %}

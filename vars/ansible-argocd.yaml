@@ -1,0 +1,5 @@
+helm_chart_path: "./argo-cd"
+helm_release_name: "argocd"
+namespace: "argocd"
+argocd_manifest_path : "./argocd-values.yaml"
+application_manifest_path : "./argocd-app-root.yaml"

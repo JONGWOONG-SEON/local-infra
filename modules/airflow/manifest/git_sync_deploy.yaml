@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "git-sync"
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "git-sync"
+  template:
+    metadata:
+      labels:
+        app: "git-sync"
+    spec:
+      securityContext:
+        runAsUser: 0
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "airflow"
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+        - name: "git-sync"
+          image: "localhost:5000/k8s.gcr.io/git-sync/git-sync:v3.6.6"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: "git-sync-env"
+          volumeMounts:
+            - name: "dags-main"
+              mountPath: "/opt/airflow/dags"
+      volumes:
+        - name: "dags-main"
+          persistentVolumeClaim:
+            claimName: "airflow-pvc"

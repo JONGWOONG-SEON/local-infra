@@ -1,0 +1,2 @@
+module_name: "airflow"
+hostPath_path: "/opt/airflow/dags"

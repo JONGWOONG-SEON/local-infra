@@ -1,0 +1,39 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: "{{ ModuleName }}{{ PvPrefix }}"
+  namespace: "{{ Namespace | default('default') }}"
+spec:
+  volumeMode: "{{ VolumeMode | default('Filesystem') }}"
+  storageClassName: "{{ StorageClassName | default('local-storage') }}"
+  capacity:
+    storage: "{{ CapacityStorage | default('5Gi') }}"
+  accessModes:
+    - "{{ AccessModes | default('ReadWriteOnce') }}"
+  persistentVolumeReclaimPolicy: "{{ ReclaimPolicy | default('Retain') }}"
+  hostPath:
+    path: "{{ HostPath | default('/data') }}"
+    type: "{{ HostType | default('DirectoryOrCreate') }}"
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: "{{ ModuleName }}"
+          operator: In
+          values:
+            - "true"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "{{ ModuleName }}{{ PvcPrefix }}"
+  namespace: "{{ Namespace | default('default') }}"
+spec:
+  storageClassName: "{{ StorageClassName | default('local-storage') }}"
+  accessModes:
+    - "{{ AccessModes | default('ReadWriteOnce') }}"
+  resources:
+    requests:
+      storage: "{{ CapacityStorage | default('5Gi') }}"
+  volumeName: "{{ ModuleName }}{{ PvPrefix }}"

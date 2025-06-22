@@ -1,0 +1,5 @@
+apiVersion: v2
+name: webhook
+description: A Helm chart for webhook static site
+version: 0.1.1
+appVersion: "1.0"

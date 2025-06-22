@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "streamlit.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "streamlit.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "streamlit.name" . }}
+    spec:
+      # template:
+      #   spec:
+      #     imagePullSecrets:
+      #       - name: registry-local-secret
+      containers:
+        - name: streamlit
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          env:
+          - name: DATASOURCE_PATH
+            value: postgresql://admin:admin@postgres-svc.default:5432/bi

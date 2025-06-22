@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "runner-env"
+  namespace: "default"
+data:
+  GITEA_RUNNER_NAME: "kind-shell-runner"
+  GITEA_RUNNER_LABELS: "kind,host"
+  GITEA_RUNNER_BACKEND: "docker"
+  DOCKER_HOST: "unix:///var/run/docker.sock"
+  GITEA_INSTANCE_URL: "http://gitea-svc.default:3000"
+  GITEA_RUNNER_REGISTRATION_TOKEN: "Ln9RWoduWKoUh0s8O49WFyzkyyuWll2EsAeFuTat"

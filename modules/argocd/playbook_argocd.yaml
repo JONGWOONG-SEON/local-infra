@@ -1,0 +1,34 @@
+- name: Install ArgoCD using Helm
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Ensure ArgoCD namespace exists
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: "{{ namespace }}"
+
+    - name: Install ArgoCD Helm Chart
+      community.kubernetes.helm:
+        kubeconfig: "{{ kubeconfig }}"
+        chart_ref: "{{ helm_chart_path }}"
+        release_name: "{{ helm_release_name }}"
+        namespace: "{{ namespace }}"
+        values_files:
+          - "{{ argocd_manifest_path }}"
+        state: present
+        update_repo_cache: true
+
+    - name: Argocd Application manifest
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ application_manifest_path }}"
+        apply: true
+

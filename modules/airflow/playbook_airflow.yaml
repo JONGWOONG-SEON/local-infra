@@ -1,0 +1,69 @@
+---
+- name: Deploy PostgreSQL StatefulSet with initContainer on Kubernetes
+  hosts: localhost
+  become: no
+  connection: local
+  
+  vars_files:
+    - ./vars/airflow_configmap.yaml
+  
+  vars:
+    ModuleName: "airflow"
+    NameSpace: "default"
+    PvPath: "./manifest/airflow_persistance.yaml"
+    SchedulerPath: "./manifest/airflow_scheduler_deploy.yaml"
+    WebPath: "./manifest/airflow_web_deploy.yaml"
+    SvcPath: "./manifest/airflow_svc.yaml"
+
+  tasks:
+    - name: Deploy Airflow ConfigMap
+      template:
+        src: ../../template/template_configmap.yaml.j2
+        dest: /tmp/{{ ModuleName }}_cm.yaml
+
+    - name: Catch Airflow CofnigMap
+      shell: cat /tmp/{{ ModuleName }}_cm.yaml
+      register: rendered
+
+    - debug:
+        var: rendered.stdout_lines
+
+    - name: Apply Manifest
+      shell: kubectl apply -f /tmp/{{ ModuleName }}_cm.yaml
+      args:
+        executable: /bin/bash
+      register: apply_result
+      failed_when: apply_result.rc != 0
+
+    - name: Save Manifest Temp to Local
+      shell: |
+        cp /tmp/{{ ModuleName }}_cm.yaml ./manifest/{{ ModuleName }}_cm.yaml
+      when: apply_result.rc == 0
+
+    - name: Apply PersistentVolume
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ PvPath }}"
+        apply: true
+
+    - name: Apply Airflow schduler
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ SchedulerPath }}"
+        apply: true
+
+    - name: Apply Airflow Web
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ WebPath }}"
+        apply: true
+
+    - name: Apply Airflow Service
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ SvcPath }}"
+        apply: true

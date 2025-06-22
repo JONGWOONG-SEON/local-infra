@@ -1,0 +1,2 @@
+nginx_manifest_path: "./deploy_nginx.yaml"
+ingress_node_name: "local_cluster_worker2"

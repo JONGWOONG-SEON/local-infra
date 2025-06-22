@@ -1,0 +1,6 @@
+ConfigData: 
+  GIT_SYNC_REPO: "http://giteaamin:giteaadmin@gitea-svc:3000/giteaadmin/airflow-dag.git"          
+  GIT_SYNC_BRANCH: "main"
+  GIT_SYNC_ROOT: "/opt/airflow/dags"
+  GIT_SYNC_DEST: "dags-main"
+  GIT_SYNC_WAIT: "60"

@@ -1,0 +1,45 @@
+- name: Deploy Webhook from template manifest
+  hosts: localhost
+  connection: local
+
+  vars_files:
+    - ../../vars/ansible_common.yaml
+    - webhook_configmap.yaml
+
+  vars:
+    ModuleName: "{{ webhook.name }}"
+    AppName: "{{ webhook.name }}"
+    ConfigMapPrefix: "{{ Prefix.configmap }}"
+    NameSpace: "{{ webhook.namespace }}"
+
+  tasks:
+    - name: Deploy Webhook Namsapce Template from Manifest
+      template:
+        src: ../../template/template_namespace.yaml.j2
+        dest: /tmp/{{ AppName }}_namespace.yaml
+
+    - name: Deploy Webhook Configmap Template from Manifest
+      template:
+        src: ../../template/template_configmap.yaml.j2
+        dest: /tmp/{{ AppName }}_cm.yaml
+
+    - name: Dump rendered manifest for debugging
+      shell: |
+        cat /tmp/{{ AppName }}_namespace.yaml
+        cat /tmp/{{ AppName }}_cm.yaml
+      register: rendered
+
+    - name: Apply ALL manifest
+      shell: |
+        kubectl apply -f /tmp/{{ AppName }}_namespace.yaml
+        kubectl apply -f /tmp/{{ AppName }}_cm.yaml
+      args:
+        executable: /bin/bash
+      register: apply_result
+      failed_when: apply_result.rc != 0
+
+    - name: Save apply 결과를 로컬 파일로 저장
+      shell: |
+        cp /tmp/{{ AppName }}_namespace.yaml ./result/{{ AppName }}_namespace.yaml
+        cp /tmp/{{ AppName }}_cm.yaml ./result/{{ AppName }}_cm.yaml
+      when: apply_result.rc == 0

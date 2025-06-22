@@ -1,0 +1,46 @@
+- name: Deploy minio from template manifest
+  hosts: localhost
+  connection: local
+
+  vars_files:
+    - ./vars/minio_configmap.yaml
+
+  vars:
+    ModuleName: "minio"
+    Namespace: "default"
+    SvcPath: "./manifest/minio_svc.yaml"
+    DeployPath: "./manifest/minio_deploy.yaml"
+    ansible_python_interpreter: "/Users/ptk-a250076-mb/3_project/dev/venv/bin/python"
+
+  tasks:
+    - name: Deploy minio ConfigMap
+      template:
+        src: ../../template/template_configmap.yaml.j2
+        dest: /tmp/{{ ModuleName }}_cm.yaml 
+
+    - name: Apply ALL manifest
+      shell: |
+        kubectl apply -f /tmp/{{ ModuleName }}_cm.yaml
+      args:
+        executable: /bin/bash
+      register: apply_result
+      failed_when: apply_result.rc != 0
+
+    - name: Save apply 결과를 로컬 파일로 저장
+      shell: |
+        cp /tmp/{{ ModuleName }}_cm.yaml ./manifest/{{ ModuleName }}_cm.yaml
+      when: apply_result.rc == 0
+        
+    - name: Apply Svc
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ SvcPath }}"
+        apply: true
+
+    - name: Apply Deployment
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        state: present
+        src: "{{ DeployPath }}"
+        apply: true

@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: webhook
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: http://gitea-svc.default:3000/giteaadmin/helm.git
+    targetRevision: main
+    path: charts/webhook
+    helm:
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: image.repository
+          value: localhost:5000/custom-webhook
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: webhook
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  # ignoreDifferences:
+  #   - group: ""
+  #     kind: Deployment
+  #     jsonPointers:
+  #       - /spec/template/spec/imagePullSecrets

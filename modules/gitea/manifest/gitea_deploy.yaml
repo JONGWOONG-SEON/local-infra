@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      containers:
+        - name: gitea
+          image: localhost:5000/gitea/gitea:1.21.11
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000 # Web UI
+            - containerPort: 22   # SSH
+          envFrom:
+            - configMapRef:
+                name: "gitea-env"
+          volumeMounts:
+            - name: gitea-data
+              mountPath: /data
+      volumes:
+        - name: gitea-data
+          persistentVolumeClaim:
+            claimName: gitea-pvc
+      nodeSelector:
+        kubernetes.io/hostname: local-cluster-worker3
+

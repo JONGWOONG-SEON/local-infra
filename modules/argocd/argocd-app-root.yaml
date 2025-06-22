@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: apps-root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: http://gitea-svc.default:3000/giteaadmin/helm.git
+    path: argocd/
+    targetRevision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

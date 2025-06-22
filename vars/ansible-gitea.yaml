@@ -1,0 +1,3 @@
+gitea_manifest_path: "./deploy_gitea.yaml"
+runner_manifest_path: "./deploy_runner.yaml"
+secret_manifest_path: "./deploy_secret.yaml"

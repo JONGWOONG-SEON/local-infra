@@ -1,0 +1,10 @@
+replicaCount: 1
+
+image:
+  repository: localhost:5000/webhook
+  tag: "0.1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8081

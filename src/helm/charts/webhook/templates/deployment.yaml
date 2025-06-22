@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "webhook.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "webhook.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "webhook.name" . }}
+    spec:
+      containers:
+        - name: webhook
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: '{{ include "webhook.name" . }}-env'

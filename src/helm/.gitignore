@@ -1,0 +1,9 @@
+.evidence/template
+.svelte-kit
+node_modules
+.DS_Store
+static/data
+*.options.yaml
+.vscode
+.env
+.evidence/meta

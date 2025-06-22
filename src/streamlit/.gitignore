@@ -1,0 +1,11 @@
+/.idea
+/.ipynb_checkpoints
+__pycahe__
+/debug
+/streamlit
+/credential
+* .pyc
+**/__pycache__/
+/.venv
+**/.env
+/source/common/dev

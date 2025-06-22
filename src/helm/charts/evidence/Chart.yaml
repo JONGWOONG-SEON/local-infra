@@ -1,0 +1,5 @@
+apiVersion: v2
+name: evidence
+description: A Helm chart for Evidence static site
+version: 0.1.1
+appVersion: "1.0"

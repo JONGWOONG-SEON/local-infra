@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "evidence.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "evidence.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "evidence.name" . }}
+    spec:
+      # template:
+      #   spec:
+      #     imagePullSecrets:
+      #       - name: registry-local-secret
+      containers:
+        - name: evidence
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000

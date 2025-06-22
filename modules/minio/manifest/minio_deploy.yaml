@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "minio"
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "minio"
+  template:
+    metadata:
+      labels:
+        app: "minio"
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "minio"
+                    operator: In
+                    values:
+                      - "true"
+      containers:
+        - name: "minio"
+          image: "localhost:5000/quay.io/minio/minio:RELEASE.2025-04-08T15-41-24Z"
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash", "-c"]
+          args:
+              - "minio server /data --address=:9000 --console-address=:9090"
+          envFrom:
+            - configMapRef:
+                name: "minio-env"
+          ports:
+          - containerPort: 9000
+          - containerPort: 9090
+          volumeMounts:
+            - mountPath: /data
+              name: localvolume
+      volumes:
+      - name: localvolume
+        hostPath: 
+          path: /s3 
+          type: DirectoryOrCreate

@@ -1,0 +1,21 @@
+replicaCount: 1
+
+image:
+  repository: localhost:5000/streamlit
+  tag: "6406dfb"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  host: streamlit.local
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  tls: false
+  tlsSecret: ""
+

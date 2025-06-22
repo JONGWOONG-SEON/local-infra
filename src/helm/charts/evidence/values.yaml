@@ -1,0 +1,20 @@
+replicaCount: 1
+
+image:
+  repository: localhost:5000/evidence
+  tag: "6fd3b16"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3000
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  host: evidence.local
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  tls: false
+  tlsSecret: ""

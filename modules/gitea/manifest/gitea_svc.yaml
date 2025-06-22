@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea-svc
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: gitea
+  ports:
+    - name: gitea-web
+      port: 3000
+      targetPort: 3000
+    - name: gitea-ssh
+      port: 22
+      targetPort: 22
+      nodePort: 30022
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: gitea-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: gitea.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gitea-svc
+                port:
+                  number: 3000
