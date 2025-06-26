@@ -1,14 +1,18 @@
 ## Local InfraStruccher 구성
 
+```
+인프라 및 데이터 파이프라인을 자체적으로 구축해보며, 각 파트별 이해도를 높히기 위해 세션 발표용 자료 입니다.
+```
+
 ### IntraStructure
 ![Provisioning](./diagram/on-premises_provisinor.jpg)
 
 ### DataFlow
 ![DataFlow](./diagram/datapipline.jpg)
 
-### *installer.sh* 실행
+### installer.sh 실행
 ```
-Images 및 Local 디펜던시 다운로드
+Images 및 Local 디펜던시 다운로드 (arm 아키텍쳐 기준)
 ```
 ### hosts 정보 갱신
 ```
