@@ -1,5 +1,11 @@
 ## Local InfraStruccher 구성
 
+### IntraStructure
+![Provisioning](./diagram/on-premises_provisinor.jpg)
+
+### DataFlow
+![DataFlow](./diagram/datapipline.jpg)
+
 ### *installer.sh* 실행
 ```
 Images 및 Local 디펜던시 다운로드
