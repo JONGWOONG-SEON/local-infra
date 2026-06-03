@@ -13,6 +13,7 @@
 **/pt.pptx
 /diagram/img
 **/*cm*
+**/.idea
 
 # 테스트
 **/stable
